@@ -1,1 +1,10 @@
+language: python
 
+python:
+  - "3.6"
+
+notifications:
+  email: tniemeier1@fh-bielefeld.de
+
+script:
+  - python -m unittest discover -s tests/
