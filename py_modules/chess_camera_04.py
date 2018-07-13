@@ -12,13 +12,9 @@ import sys
 import os
 import cv2
 import numpy as np
-import glob
-from pathlib import Path
 import base64
-from tkinter import messagebox
-
-import chess_math
 import math
+import chess_math
 
 # debug options
 debug = 0
@@ -280,11 +276,11 @@ def draw_main_angles(source,angles):
 def toolchain_01(given_image):
     image_original = given_image
     image_resize = resize(image_original)
-    image_blur = blur(image_resize);
-    image_gray = gray(image_blur);
-    image_clahe = clahe(image_gray);
-    image_canny = canny(image_clahe);
-    line_set = houghlinesp(image_canny);
+    image_blur = blur(image_resize)
+    image_gray = gray(image_blur)
+    image_clahe = clahe(image_gray)
+    image_canny = canny(image_clahe)
+    line_set = houghlinesp(image_canny)
     line_list = chess_math.get_list_from_linearray(line_set)
     # divide the houghlines in two parts
     line_list_horizontal = chess_math.divide_line_list_by_direction(line_list,0)
@@ -302,11 +298,11 @@ def toolchain_01(given_image):
 def toolchain_02(given_image, already_used_angle):
     image_original = given_image
     image_resize = resize(image_original)
-    image_blur = blur(image_resize);
-    image_gray = gray(image_blur);
-    image_clahe = clahe(image_gray);
-    image_canny = canny(image_clahe);
-    line_set = houghlinesp(image_canny);
+    image_blur = blur(image_resize)
+    image_gray = gray(image_blur)
+    image_clahe = clahe(image_gray)
+    image_canny = canny(image_clahe)
+    line_set = houghlinesp(image_canny)
     line_list = chess_math.get_list_from_linearray(line_set)
     # divide the houghlines in two parts
     line_list_vertical = chess_math.divide_line_list_by_direction(line_list, 1)
@@ -323,15 +319,14 @@ def toolchain_02(given_image, already_used_angle):
     return line_list_vertical
 
 
-
 def toolchain_03(given_image):
     image_original = given_image
     image_resize = resize(image_original)
-    image_blur = blur(image_resize);
-    image_gray = gray(image_blur);
-    image_clahe = clahe(image_gray);
-    image_canny = canny(image_clahe);
-    line_set = houghlinesp(image_canny);
+    image_blur = blur(image_resize)
+    image_gray = gray(image_blur)
+    image_clahe = clahe(image_gray)
+    image_canny = canny(image_clahe)
+    line_set = houghlinesp(image_canny)
     line_list = chess_math.get_list_from_linearray(line_set)
     line_list = chess_math.expand_lines_to_image_size(line_list, image_resize.shape[1], image_resize.shape[0])
     line_list = chess_math.homogen_lines(line_list)
@@ -393,7 +388,7 @@ def toolchain_00(original_image):
     average_horizontal_angle = chess_math.get_average_angle(horizontals)
     while (number_of_vertical_lines > 10):
         houghlinesp_threshold = houghlinesp_threshold + 2
-        verticals=toolchain_02(original_image, average_horizontal_angle)
+        verticals = toolchain_02(original_image, average_horizontal_angle)
         number_of_vertical_lines = len(verticals)
     horizontal_pitch_angle = chess_math.pitch_angle_parallel(horizontals)
     vertical_pitch_angle = chess_math.pitch_angle_parallel(verticals)
@@ -565,7 +560,6 @@ def toolchain_00(original_image):
     camera_point_3 = chess_math.section_point_2d(middles_horizontal[1], middles_vertical[0])
     camera_point_4 = chess_math.section_point_2d(middles_horizontal[1], middles_vertical[1])
     camera_points = [camera_point_1, camera_point_2, camera_point_3, camera_point_4]
-    first_camera_points = [camera_point_1, camera_point_2, camera_point_3, camera_point_4]
 
     # draw result
     if debug > 1:
@@ -609,17 +603,13 @@ def toolchain_00(original_image):
     gamma = math.asin(rmat[0, 2] / math.sin(beta))
     if (abs(-1 * math.sin(beta) * math.cos(gamma) - rmat[1, 2]) > 0.0001):
         gamma = math.pi - gamma
-    rotation_matrix = chess_math.rotation_matrix_from_euler_angles(alpha, beta, gamma)
+    test_matrix = chess_math.rotation_matrix_from_euler_angles(alpha, beta, gamma)
 
 
     # searching good points on the board
     section_points_list = chess_math.section_point_list_from_two_line_lists(verticals, horizontals)
     search_distance = 5
     intrinsinc_guess = False
-    flag = cv2.SOLVEPNP_P3P
-    flag = cv2.SOLVEPNP_UPNP
-    flag = cv2.SOLVEPNP_ITERATIVE
-    flag = cv2.SOLVEPNP_EPNP
     flag = cv2.SOLVEPNP_DLS
 
     for i in range(1, 5):      # number of tries
@@ -875,7 +865,7 @@ def toolchain_00(original_image):
                 if debug > 2:
                     field_image = field_image[int(min_y - border): int(max_y + border), int(min_x - border): int(max_x + border)]
                     new_filename = filename + " field " + str(i) + "_" + str(j) + ".jpg"
-                    cv2.imwrite(new_filename, field_image);
+                    cv2.imwrite(new_filename, field_image)
             else:
                 # the field to check is outside the image
                 field_color[j][i] = ' '
@@ -941,6 +931,9 @@ def toolchain_00(original_image):
     max_ranking_wrong = 0
     target_line_right_direction = ['w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w']
     target_line_wrong_direction = ['b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'b', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w', 'b']
+    target_line = 0
+    target_start_line = 0
+    target_start_column = 0
     for long_text in long_texts:
         start_line = long_text[0]
         start_column = long_text[1]
@@ -1025,7 +1018,7 @@ def toolchain_00(original_image):
     # on debug: save the result
     if debug > 2:
         new_filename = filename + "result.jpg"
-        cv2.imwrite(new_filename , image_result);
+        cv2.imwrite(new_filename , image_result)
 
 
     #
@@ -1091,7 +1084,6 @@ def toolchain_00(original_image):
                 figure_image = cv2.resize(figure_image, (destination_width, destination_height), interpolation=cv2.INTER_CUBIC)
                 clahe_cliplimit = 20
                 clahe_tilegridsize = 4
-                figure_image_clahe = clahe(gray(figure_image))
                 canny_min = 150
                 canny_max = 200
                 figure_image_canny = canny(clahe(gray(figure_image)))
@@ -1104,9 +1096,9 @@ def toolchain_00(original_image):
                 # on debug: save the figure pictures
                 if debug > 2:
                     new_filename = filename + "x_field " + str(i) + "_" + str(j) + "arotated" ".jpg"
-                    cv2.imwrite(new_filename, figure_image);
+                    cv2.imwrite(new_filename, figure_image)
                     new_filename = filename + "x_field " + str(i) + "_" + str(j) + "canny" ".jpg"
-                    cv2.imwrite(new_filename, figure_image_canny);
+                    cv2.imwrite(new_filename, figure_image_canny)
 
                 """
                 # template-matching doesn't work yet, so this part ist outcommented 
@@ -1234,7 +1226,7 @@ def read_image_via_pipe():
 def read_image_from_file(file):
     global filename
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = dir_path + file;
+    filename = dir_path + file
     img = cv2.imread(filename, cv2.IMREAD_COLOR)
     if debug > 0:
         print()

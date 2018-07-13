@@ -5,8 +5,13 @@ import glob
 import math
 
 
-
-
+"""
+the function reduces a list of lines by a given threshold for the horizontal proportion
+all lines in the list with a less horizontal proportion will not be passed into the returned list
+: param line_list : the list of lines    
+: param threshold : the threshold for the horizontal proportion
+: return   : the reduced list 
+"""
 def reduce_line_list_by_horizontal_length_threshold(line_list, threshold):
     res_list = []
     for i in range(len(line_list)):
@@ -15,6 +20,13 @@ def reduce_line_list_by_horizontal_length_threshold(line_list, threshold):
     return res_list
 
 
+"""
+the function reduces a list of lines by a given threshold for the vertical proportion
+all lines in the list with a less vertical proportion will not be passed into the returned list
+: param line_list : the list of lines    
+: param threshold : the threshold for the vertical proportion
+: return   : the reduced list 
+"""
 def reduce_line_list_by_vertical_length_threshold(line_list, threshold):
     res_list = []
     for i in range(len(line_list)):
@@ -23,6 +35,12 @@ def reduce_line_list_by_vertical_length_threshold(line_list, threshold):
     return res_list
 
 
+"""
+the function returns a line (as a list) from two given points
+: param point1 : the first point    
+: param point2 : the second point
+: return   : the line as a list of 4 values 
+"""
 def get_line_from_points(point1, point2):
     line = []
     line.append(point1[0])
@@ -32,6 +50,12 @@ def get_line_from_points(point1, point2):
     return line
 
 
+"""
+the function returns the distance from a given point to the nearest point of a list of points
+: param point      : the point    
+: param point_list : the list of points
+: return           : the minimal distance 
+"""
 def get_min_distance_from_point_to_one_point_of_a_list(point, point_list):
     min_distance = 1e12
     for i in range(len(point_list)):
@@ -42,6 +66,12 @@ def get_min_distance_from_point_to_one_point_of_a_list(point, point_list):
     return min_distance
 
 
+"""
+the function returns the point out of a list of point which is nearest to a given point
+: param point      : the point    
+: param point_list : the list of points
+: return           : the nearest point out of the list 
+"""
 def get_nearest_point_out_of_a_list(point, point_list):
     min_distance = 1e12
     for i in range(len(point_list)):
@@ -93,20 +123,16 @@ def rotation_matrix_from_euler_angles(z_angle, x1_angle, z2_angle):
     return rotation_matrix
 
 
-
-
-
 """
-the function calculates a initial camera matrix from given points on the image
+the function calculates a initial camera matrix from given points on the image and a given square size
 : param image_points     : list of four image points as corners of one chessfield in pixel coordinates    
 : param chess_field_size : the (valued) size of one chessfield im mm
 : param image_width      : the width of the image in pixels
 : param image_height     : the height of the image in pixels
-: return                 : 
+: return                 : the camera matrix
 """
 def get_camera_matrix(image_points, chess_field_size, image_width, image_height):
     img_points = nparray_2D_from_point_list(image_points)
-    #mod_points = np.array([[0.0, 0.0, 0.0], [chess_field_size, 0.0, 0.0], [0.0, -chess_field_size, 0.0], [chess_field_size, -chess_field_size, 0.0]], np.float32)
     mod_points = np.array([[0.0, 0.0, 0.0], [chess_field_size, 0.0, 0.0], [0.0, chess_field_size, 0.0], [chess_field_size, chess_field_size, 0.0]], np.float32)
     objpoints = []
     imgpoints = []
@@ -117,6 +143,14 @@ def get_camera_matrix(image_points, chess_field_size, image_width, image_height)
 
 
 
+"""
+the function calculates a camera matrix from given image points and model points
+: param image_points     : list of image points    
+: param model_points     : list of model points    
+: param image_width      : the width of the image in pixels
+: param image_height     : the height of the image in pixels
+: return                 : the camera matrix
+"""
 def get_next_camera_matrix(image_points, model_points, image_width, image_height):
     img_points = nparray_2D_from_point_list(image_points)
     mod_points = nparray_3D_from_point_list(model_points)
@@ -128,9 +162,14 @@ def get_next_camera_matrix(image_points, model_points, image_width, image_height
     return camera_matrix
 
 
+"""
+the function returns a list of homogenic lines calculated from a given list of lines
+the returned lines have all a lower first x value than the second x value
+: param line_list : list of lines    
+: return          : list of homogenic lines
+"""
 def homogen_lines(line_list):
     res_list = []
-    new_line = []
     for i in range(len(line_list)):
         line = line_list[i]
         new_line = line
@@ -152,7 +191,7 @@ def delete_identical_lines_from_list(line_list):
             dest = res_list[j]
             if source == dest:
                 identical = True
-        if identical == False:
+        if not identical:
             res_list.append(source)
     return res_list
 
@@ -205,7 +244,7 @@ def get_pattern_distance(line_list, section_line, section_center):
     for test_distance in range(min_pattern_distance, max_pattern_distance):  #loop the distance
         for i in range(len(section_points)):                                 #loop the startpoint
             start_point = section_points[i]
-            if increase_pattern_distance == True:
+            if increase_pattern_distance:
                 increase_factor = 1.0 + 30 / distance_points_2d(section_center, start_point)
             else:
                 increase_factor = 1.0
@@ -223,44 +262,12 @@ def get_pattern_distance(line_list, section_line, section_center):
                 distance_sum += min_distance
             if distance_sum < min_distance_sum:
                 min_distance_sum = distance_sum
-                pattern_distance = test_distance
-                pattern_points = test_points
-    return pattern_points
-
-
-def get_pattern_distance_old(line_list, section_line, section_center):
-    section_points = []
-    for i in range(len(line_list)):
-        section_points.append(section_point_2d(line_list[i], section_line))
-    min_pattern_distance = int(max_distance_of_point_list(section_points) / 12)
-    max_pattern_distance = int(max_distance_of_point_list(section_points) / 8)
-    min_distance_sum = 1e12
-    section_line_vector = [(section_line[2] - section_line[0]), section_line[3] - section_line[1]]
-    for test_distance in range(min_pattern_distance, max_pattern_distance):  # loop the distance
-        for i in range(len(section_points)):  # loop the startpoint
-            start_point = section_points[i]
-            test_points = []
-            distance_sum = 0
-            for j in range(0, 9):
-                test_vector = change_2D_vector_to_length(section_line_vector,- j * test_distance)
-                test_point = get_sum_of_2D_vectors(start_point, test_vector)
-                test_points.append(test_point)
-                min_distance = 1e12
-                for k in range(len(section_points)):
-                    distance = distance_points_2d(test_point, section_points[k])
-                    if distance < min_distance:
-                        min_distance = distance
-                distance_sum += min_distance
-            if distance_sum < min_distance_sum:
-                min_distance_sum = distance_sum
-                pattern_distance = test_distance
                 pattern_points = test_points
     return pattern_points
 
 
 def sort_line_list_by_height(line_list):
     angle_sum = 0
-    pair = []
     pair_list = []
     res_list = []
     for i in range(len(line_list)):
@@ -343,8 +350,7 @@ def get_middle_line_of_line_list(line_list):
         for i in range(len(line_list)):
             value = get_section_with_y_axis(line_list[i])
             if abs(middle_value - value) < min_distance_to_middle_value:
-                chosen_middle_value = value
-                middle_line = line_list[i];
+                middle_line = line_list[i]
                 min_distance_to_middle_value = abs(middle_value - value)
     else:
         # vertical style lines
@@ -359,7 +365,7 @@ def get_middle_line_of_line_list(line_list):
         for i in range(len(line_list)):
             value = get_section_with_x_axis(line_list[i])
             if abs(middle_value - value) < min_distance_to_middle_value:
-                middle_line = line_list[i];
+                middle_line = line_list[i]
                 min_distance_to_middle_value = abs(middle_value - value)
     return middle_line
 
@@ -566,24 +572,24 @@ def expand_lines_to_image_size_old(line_list, image_width, image_height):
         res_y1 = 10000
         res_x2 = 10000
         res_y2 = 10000
-        if y_x_0 >= 0 and y_x_0 <= image_height:
+        if 0 <= y_x_0 <= image_height:
             res_x1=0
             res_y1=y_x_0
-        if y_x_image_width >= 0 and y_x_image_width <= image_height:
+        if 0 <= y_x_image_width <= image_height:
             if res_x1 == 10000:
                 res_x1 = image_width
                 res_y1 = y_x_image_width
             else:
                 res_x2 = image_width
                 res_y2 = y_x_image_width
-        if x_y_0 >= 0 and x_y_0 <= image_width:
+        if 0 <= x_y_0 <= image_width:
             if res_x1 == 10000:
                 res_x1 = x_y_0
                 res_y1 = 0
             else:
                 res_x2 = x_y_0
                 res_y2 = 0
-        if x_y_image_height >= 0 and x_y_image_height <= image_width:
+        if 0 <= x_y_image_height <= image_width:
             if res_x1 == 10000:
                 res_x1=x_y_image_height
                 res_y1=image_height
@@ -629,12 +635,12 @@ def sort_section_points_by_distance_to_middle(section_points, middle_x, middle_y
     res_list = []
     for i in range(len(section_points)):
         distance_to_middle = distance_points_2d(middle_point, section_points[i])
-        tuple = (section_points[i], distance_to_middle)
-        tuple_list.append(tuple)
+        the_tuple = (section_points[i], distance_to_middle)
+        tuple_list.append(the_tuple)
     sorted_tuple_list = sorted(tuple_list, key=lambda item: item[1])
     for i in range(len(sorted_tuple_list)):
-        tuple = sorted_tuple_list[i]
-        res_list.append(tuple[0])
+        the_tuple = sorted_tuple_list[i]
+        res_list.append(the_tuple[0])
     return res_list
 
 
@@ -652,12 +658,12 @@ def sort_points_by_angle_to_middle(point_list):
         x = point_list[i][0] - mid_x
         y = point_list[i][1] - mid_y
         angle = math.atan2(y, x)
-        tuple = (point_list[i], angle)
-        tuple_list.append(tuple)
+        the_tuple = (point_list[i], angle)
+        tuple_list.append(the_tuple)
     sorted_tuple_list = sorted(tuple_list, key=lambda item: item[1])
     for i in range(len(sorted_tuple_list)):
-        tuple = sorted_tuple_list[i]
-        res_list.append(tuple[0])
+        the_tuple = sorted_tuple_list[i]
+        res_list.append(the_tuple[0])
     return res_list
 
 
@@ -815,7 +821,7 @@ def reduce_points(points,distance):
                 for point2 in reduced_points:
                     if (distance_points_2d(point1,point2))<distance:
                         takeover=False
-            if takeover==True:
+            if takeover:
                 reduced_points.append(point1)
     return reduced_points
 
@@ -853,13 +859,12 @@ def get_list_from_linearray(linearray):
         for line in linearray:
             line_list = get_list_from_line(line)
             unsorted_list.append(line_list)
-        sorted_list=sorted(unsorted_list, key=lambda line: line[4], reverse=True)
+        sorted_list=sorted(unsorted_list, key=lambda item: item[4], reverse=True)
     return sorted_list
 
 
 def divide_line_list_by_average_angle(line_list,direction):
     divided_list = []
-    counter=0
     angle_sum=0
     for line in line_list:
         angle_sum += line[5]
@@ -927,13 +932,13 @@ def divide_line_list_by_direction_new(line_list,direction):
     verticals = []
     for line in line_list:
         angle = get_angle_from_line(line)
-        if angle >= math.pi * 0/4 and angle < math.pi * 1/4:
+        if math.pi * 0/4 <= angle < math.pi * 1/4:
             horizontals.append(line)
-        if angle >= math.pi * 1/4 and angle < math.pi * 2/4:
+        if math.pi * 1/4 <= angle < math.pi * 2/4:
             verticals.append(line)
-        if angle >= math.pi * 2/4 and angle < math.pi * 3/4:
+        if math.pi * 2/4 <= angle < math.pi * 3/4:
             verticals.append(line)
-        if angle >= math.pi * 3/4 and angle <= math.pi * 4/4:
+        if math.pi * 3/4 <= angle <= math.pi * 4/4:
             horizontals.append(line)
     if direction == 0:
         divided_list = horizontals
@@ -947,14 +952,14 @@ def divide_line_list_by_direction_new(line_list,direction):
 def eliminate_sectioners(line_list, source_image):
     source_height, source_width = source_image.shape[:2]
     new_list = []
-    angle_sum=0
+    angle_sum = 0
     for line1 in line_list:
         counter = 0
         for line2 in line_list:
             section_point=section_point_2d(line1,line2)
             if (section_point[0]!=-1 and section_point[1]!=-1):
-                if (section_point[0]>=0 and section_point[0]<=source_width):
-                    if (section_point[1] >= 0 and section_point[1] <= source_height):
+                if (0 <= section_point[0] <= source_width):
+                    if (0 <= section_point[1] <= source_height):
                         counter += 1
         if (counter<8):
             new_list.append(line1)
@@ -997,9 +1002,9 @@ def get_angle_from_line(line):
     x = x2 - x1
     if (x != 0):
         angle = math.atan(abs(y) / abs(x))
-        if (y >= 0 and x < 0):
+        if (y >= 0 > x):
             angle = math.pi - angle
-        if (y < 0 and x >= 0):
+        if (y < 0 <= x):
             angle = math.pi - angle
     else:
         angle = math.pi/2
